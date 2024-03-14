@@ -71,7 +71,7 @@ void Lab7::FrameStart()
 
     glm::ivec2 resolution = window->GetResolution();
     // Sets the screen area where to draw
-    glViewport(0, 0, resolution.x, resolution.y);
+    glViewport(0, 0, resolution.x / 2, resolution.y / 2);
 }
 
 
@@ -131,12 +131,27 @@ void Lab7::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelM
     glUseProgram(shader->program);
 
     // Set shader uniforms for light & material properties
-    // TODO(student): Set light position uniform
+    // TODO(student): Set light position uniform 
+    int light = glGetUniformLocation(shader->program, "light_position");
+    glUniform3fv(light, 1, glm::value_ptr(lightPosition));
 
     glm::vec3 eyePosition = GetSceneCamera()->m_transform->GetWorldPosition();
     // TODO(student): Set eye position (camera position) uniform
+    int eye = glGetUniformLocation(shader->program, "eye_position");
+    glUniform3fv(eye, 1, glm::value_ptr(eyePosition));
 
     // TODO(student): Set material property uniforms (shininess, kd, ks, object color)
+    int shine = glGetUniformLocation(shader->program, "material_shininess");
+    glUniform1i(shine, materialShininess);
+
+    int kd = glGetUniformLocation(shader->program, "material_kd");
+    glUniform1f(kd, materialKd);
+
+    int ks = glGetUniformLocation(shader->program, "material_ks");
+    glUniform1f(ks, materialKs);
+
+    int clr = glGetUniformLocation(shader->program, "object_color");
+    glUniform3fv(clr, 1, glm::value_ptr(color));
 
     // Bind model matrix
     GLint loc_model_matrix = glGetUniformLocation(shader->program, "Model");

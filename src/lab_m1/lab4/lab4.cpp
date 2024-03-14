@@ -67,16 +67,17 @@ void Lab4::RenderScene() {
     modelMatrix *= transform3D::Translate(translateX, translateY, translateZ);
     RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
 
-    modelMatrix = glm::mat4(1);
-    modelMatrix *= transform3D::Translate(0.0f, 0.5f, -1.5f);
-    modelMatrix *= transform3D::Scale(scaleX, scaleY, scaleZ);
-    RenderMesh(meshes["box"], shaders["Simple"], modelMatrix);
 
-    modelMatrix = glm::mat4(1);
-    modelMatrix *= transform3D::Translate(2.5f, 0.5f, -1.5f);
-    modelMatrix *= transform3D::RotateOX(angularStepOX);
-    modelMatrix *= transform3D::RotateOY(angularStepOY);
-    modelMatrix *= transform3D::RotateOZ(angularStepOZ);
+    glm::mat4 modelMatrix2 = glm::mat4(1);
+    modelMatrix2 *= transform3D::Translate(0.0f, 0.5f, -1.5f);
+    modelMatrix2 *= transform3D::Scale(scaleX, scaleY, scaleZ);
+    RenderMesh(meshes["box"], shaders["Simple"], modelMatrix2);
+
+    modelMatrix = transform3D::RotateOZ(angularStepOZ) * transform3D::Translate(2.0, 0, 0) * modelMatrix2;
+    // modelMatrix *= transform3D::Translate(2.5f, 0.5f, -1.5f);
+    // modelMatrix *= transform3D::RotateOX(angularStepOX);
+    // modelMatrix *= transform3D::RotateOY(angularStepOY);
+    // modelMatrix *= transform3D::RotateOZ(angularStepOZ);
     RenderMesh(meshes["box"], shaders["VertexNormal"], modelMatrix);
 }
 
@@ -88,7 +89,7 @@ void Lab4::Update(float deltaTimeSeconds)
 
     // Sets the screen area where to draw
     glm::ivec2 resolution = window->GetResolution();
-    glViewport(0, 0, resolution.x, resolution.y);
+    glViewport(0, 0, resolution.x / 2, resolution.y / 2);
 
     RenderScene();
     DrawCoordinateSystem();
@@ -97,6 +98,7 @@ void Lab4::Update(float deltaTimeSeconds)
     glViewport(miniViewportArea.x, miniViewportArea.y, miniViewportArea.width, miniViewportArea.height);
 
     // TODO(student): render the scene again, in the new viewport
+    RenderScene();
     DrawCoordinateSystem();
 }
 
@@ -114,6 +116,52 @@ void Lab4::FrameEnd()
 void Lab4::OnInputUpdate(float deltaTime, int mods)
 {
     // TODO(student): Add transformation logic
+    if(window->KeyHold(GLFW_KEY_W)) {
+        translateZ -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_S)) {
+        translateZ += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_A)) {
+        translateX -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_D)) {
+        translateX += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_R)) {
+        translateY += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_F)) {
+        translateY -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_1)) {
+        scaleX += 2 * deltaTime;
+        scaleY += 2 * deltaTime;
+        scaleZ += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_2)) {
+        scaleX -= 2 * deltaTime;
+        scaleY -= 2 * deltaTime;
+        scaleZ -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_3)) {
+        angularStepOX += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_4)) {
+        angularStepOX -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_5)) {
+        angularStepOY += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_6)) {
+        angularStepOY -= 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_7)) {
+        angularStepOZ += 2 * deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_8)) {
+        angularStepOZ -= 2 * deltaTime;
+    }
 
 }
 
@@ -135,6 +183,29 @@ void Lab4::OnKeyPress(int key, int mods)
             polygonMode = GL_LINE;
             break;
         }
+    }
+
+    if (key == GLFW_KEY_I) {
+        miniViewportArea.y += 20;
+    }
+    if (key == GLFW_KEY_J) {
+        miniViewportArea.x -= 20;
+    }
+    if (key == GLFW_KEY_K) {
+        miniViewportArea.y -= 20;
+    }
+    if (key == GLFW_KEY_L) {
+        miniViewportArea.x += 20;
+    }
+    if (key == GLFW_KEY_U) {
+        float aux = miniViewportArea.height * 1.0 / miniViewportArea.width * 1.0;
+        miniViewportArea.height += 20 * aux;
+        miniViewportArea.width += 20;
+    }
+    if (key == GLFW_KEY_O) {
+        float aux = miniViewportArea.height * 1.0 / miniViewportArea.width * 1.0;
+        miniViewportArea.height -= 20 * aux;
+        miniViewportArea.width -= 20;
     }
     
     // TODO(student): Add viewport movement and scaling logic

@@ -12,11 +12,15 @@ using namespace m1;
  *  and the order in which they are called, see `world.cpp`.
  */
 
+float bgR, bgG, bgB;
+Mesh *meshCycle;
+Mesh *meshVector[3];
+int idx = 0;
 
 Lab1::Lab1()
 {
     // TODO(student): Never forget to initialize class variables!
-
+    bgR = 0.3; bgG = 0.5; bgB = 0.7;
 }
 
 
@@ -33,6 +37,23 @@ void Lab1::Init()
         Mesh* mesh = new Mesh("box");
         mesh->LoadMesh(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::MODELS, "primitives"), "box.obj");
         meshes[mesh->GetMeshID()] = mesh;
+
+        Mesh* mesh2 = new Mesh("bunny");
+        mesh2->LoadMesh(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::MODELS, "animals"), "bunny.obj");
+        meshes[mesh2->GetMeshID()] = mesh2;
+
+        Mesh* mesh3 = new Mesh("teapot");
+        mesh3->LoadMesh(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::MODELS, "primitives"), "teapot.obj");
+        meshes[mesh3->GetMeshID()] = mesh3;
+
+        Mesh* mesh4 = new Mesh("sphere");
+        mesh4->LoadMesh(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::MODELS, "primitives"), "sphere.obj");
+        meshes[mesh4->GetMeshID()] = mesh4;
+
+        meshVector[0] = mesh;
+        meshVector[1] = mesh4;
+        meshVector[2] = mesh3;
+        meshCycle = mesh;
     }
 
     // TODO(student): Load some more meshes. The value of RESOURCE_PATH::MODELS
@@ -55,7 +76,7 @@ void Lab1::Update(float deltaTimeSeconds)
     // TODO(student): Generalize the arguments of `glClearColor`.
     // You can, for example, declare three variables in the class header,
     // that will store the color components (red, green, blue).
-    glClearColor(0, 0, 0, 1);
+    glClearColor(bgR, bgG, bgB, 1);
 
     // Clears the color buffer (using the previously set color) and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -73,7 +94,8 @@ void Lab1::Update(float deltaTimeSeconds)
     // was previously loaded. We do this using `RenderMesh`. Check the
     // signature of this function to see the meaning of its parameters.
     // You can draw the same mesh any number of times.
-
+    RenderMesh(meshCycle, glm::vec3(4, 0, 0));
+    RenderMesh(meshes["bunny"], glm::vec3(2, 2, 0), glm::vec3(0.03f));
 }
 
 
@@ -105,12 +127,22 @@ void Lab1::OnKeyPress(int key, int mods)
     // Add key press event
     if (key == GLFW_KEY_F) {
         // TODO(student): Change the values of the color components.
-
+        if(bgR)
+            bgR = 0;
+        else
+            bgR = 1;
     }
 
     // TODO(student): Add a key press event that will let you cycle
     // through at least two meshes, rendered at the same position.
     // You will also need to generalize the mesh name used by `RenderMesh`.
+    if (key == GLFW_KEY_R) {
+        if(idx == 2)
+            idx = 0;
+        else
+            idx++;
+        meshCycle = meshVector[idx];
+    }
 
 }
 

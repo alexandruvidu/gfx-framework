@@ -30,11 +30,12 @@ namespace m1
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
 
-        glm::vec3 lightPosition;
+        glm::vec3 lightPosition1, lightPosition2;
         glm::vec3 lightDirection;
         unsigned int materialShininess;
         float materialKd;
         float materialKs;
+        int spot;
 
         // TODO(student): If you need any other class variables, define them here.
 

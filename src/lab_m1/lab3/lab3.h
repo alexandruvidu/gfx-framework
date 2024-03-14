@@ -29,10 +29,11 @@ namespace m1
 
      protected:
         float cx, cy;
-        glm::mat3 modelMatrix;
+        glm::mat3 modelMatrix1, modelMatrix2, modelMatrix3;
         float translateX, translateY;
         float scaleX, scaleY;
         float angularStep;
+        float rot2, rot3;
 
         // TODO(student): If you need any other class variables, define them here.
 

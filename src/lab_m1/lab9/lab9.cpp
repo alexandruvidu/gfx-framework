@@ -97,7 +97,10 @@ void Lab9::Init()
         vector<glm::vec2> textureCoords
         {
             // TODO(student): Complete texture coordinates for the square
-            glm::vec2(0.0f, 0.0f)
+            glm::vec2(0.f, 0.f),
+			glm::vec2(1.f, 0.f),
+			glm::vec2(1.f, 1.f),
+			glm::vec2(0.f, 1.f)
 
         };
 
@@ -131,7 +134,7 @@ void Lab9::FrameStart()
 
     glm::ivec2 resolution = window->GetResolution();
     // Sets the screen area where to draw
-    glViewport(0, 0, resolution.x, resolution.y);
+    glViewport(0, 0, resolution.x / 2, resolution.y / 2);
 }
 
 
@@ -142,6 +145,7 @@ void Lab9::Update(float deltaTimeSeconds)
     // and the "random" texture, and you will use the `mix` function
     // in the fragment shader to mix these two textures.
     //
+
     // However, you may have the unpleasant surprise that the "random"
     // texture now appears onto all objects in the scene, even though
     // you are only passing the second texture for a single object!
@@ -214,6 +218,17 @@ void Lab9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelM
     glUniformMatrix4fv(loc_projection_matrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
     // TODO(student): Set any other shader uniforms that you need
+    GLint locTime = glGetUniformLocation(shader->program, "time");    
+
+    if (mesh == meshes["sphere"])
+	{
+		glUniform1f(locTime, (GLfloat)Engine::GetElapsedTime());
+	} else
+	{
+		glUniform1f(locTime, -1.f);
+	}
+
+	glUniform1i(glGetUniformLocation(shader->program, "mix_textures"), mixTextures);
 
     if (texture1)
     {
@@ -221,6 +236,15 @@ void Lab9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelM
         // - activate texture location 0
         // - bind the texture1 ID
         // - send theuniform value
+
+        // Activate texture location 0
+		glActiveTexture(GL_TEXTURE0);
+
+		// Bind the texture1 ID
+		glBindTexture(GL_TEXTURE_2D, texture1->GetTextureID());
+
+		// Send texture uniform value
+		glUniform1i(glGetUniformLocation(shader->program, "texture_1"), 0);
 
     }
 
@@ -231,6 +255,14 @@ void Lab9::RenderSimpleMesh(Mesh *mesh, Shader *shader, const glm::mat4 & modelM
         // - bind the texture2 ID
         // - send the uniform value
 
+        // Activate texture location 1
+		glActiveTexture(GL_TEXTURE1);
+
+		// Bind the texture2 ID
+		glBindTexture(GL_TEXTURE_2D, texture2->GetTextureID());
+
+		// Send texture uniform value
+		glUniform1i(glGetUniformLocation(shader->program, "texture_2"), 1);
     }
 
     // Draw the object
@@ -248,11 +280,21 @@ Texture2D* Lab9::CreateRandomTexture(unsigned int width, unsigned int height)
 
     // TODO(student): Generate random texture data
 
+    for (size_t i = 0; i < size; ++i)
+	{
+		data[i] = rand() % (UINT8_MAX + 1);
+	}
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     // TODO(student): Generate and bind the new texture ID
 
-    if (GLEW_EXT_texture_filter_anisotropic) {
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4);
-    }
     // TODO(student): Set the texture parameters (MIN_FILTER, MAG_FILTER and WRAPPING MODE) using glTexParameteri
 
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -263,6 +305,7 @@ Texture2D* Lab9::CreateRandomTexture(unsigned int width, unsigned int height)
 
     // TODO(student): Generate texture mip-maps
 
+    glGenerateMipmap(GL_TEXTURE_2D);
     CheckOpenGLError();
 
     // Save the texture into a wrapper Texture2D class for using easier later during rendering phase

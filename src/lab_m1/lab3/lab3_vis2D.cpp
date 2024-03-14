@@ -113,7 +113,7 @@ void Lab3_Vis2D::Update(float deltaTimeSeconds)
     glm::ivec2 resolution = window->GetResolution();
 
     // Sets the screen area where to draw - the left half of the window
-    viewSpace = ViewportSpace(0, 0, resolution.x / 2, resolution.y);
+    viewSpace = ViewportSpace(0, 0, resolution.x / 4, resolution.y / 2);
     SetViewportArea(viewSpace, glm::vec3(0), true);
 
     // Compute the 2D visualization matrix
@@ -124,7 +124,7 @@ void Lab3_Vis2D::Update(float deltaTimeSeconds)
 
     // The viewport is now the right half of the window
 
-    viewSpace = ViewportSpace(resolution.x / 2, 0, resolution.x / 2, resolution.y);
+    viewSpace = ViewportSpace(resolution.x / 4, 0, resolution.x / 4, resolution.y / 2);
     SetViewportArea(viewSpace, glm::vec3(0.5f), true);
 
     // Compute uniform 2D visualization matrix
@@ -167,6 +167,40 @@ void Lab3_Vis2D::DrawScene(glm::mat3 visMatrix)
 void Lab3_Vis2D::OnInputUpdate(float deltaTime, int mods)
 {
     // TODO(student): Move the logic window with W, A, S, D (up, left, down, right)
+    if(window->KeyHold(GLFW_KEY_W)) {
+        logicSpace.y += deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_A)) {
+        logicSpace.x -= deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_S)) {
+        logicSpace.y -= deltaTime; 
+    }
+    if(window->KeyHold(GLFW_KEY_D)) {
+        logicSpace.x += deltaTime;
+    }
+    if(window->KeyHold(GLFW_KEY_Z)) {
+        float height = logicSpace.height;
+        float width = logicSpace.width;
+        logicSpace.height = height * 0.97;
+        logicSpace.width = width * 0.97;
+
+        logicSpace.x += 0.015 * width;
+        logicSpace.y += 0.015 * height;
+        
+
+    }
+    if(window->KeyHold(GLFW_KEY_X)) {
+        float height = logicSpace.height;
+        float width = logicSpace.width;
+        logicSpace.height = height * 1.03;
+        logicSpace.width = width * 1.03;
+
+        logicSpace.x -= 0.015 * width;
+        logicSpace.y -= 0.015 * height;
+
+
+    }
 
     // TODO(student): Zoom in and zoom out logic window with Z and X
 
